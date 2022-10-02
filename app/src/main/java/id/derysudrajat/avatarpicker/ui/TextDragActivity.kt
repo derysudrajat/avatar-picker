@@ -7,7 +7,6 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.util.component1
@@ -99,22 +98,18 @@ class TextDragActivity : AppCompatActivity() {
         }
     }
 
-    private fun getTagAdapter(tags: MutableList<String>? = null) =
-        object : EasyAdapter<String, ItemTagBinding>(tags ?: listOfGenre.sorted().toMutableList()) {
-            override fun create(parent: ViewGroup): ItemTagBinding = ItemTagBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
-
-            override fun onBind(binding: ItemTagBinding, data: String) {
-                binding.tvTag.text = data
-                DragStartHelper(binding.tvTag) { view, _ ->
-                    val text = (view as TextView).text
-                    val dragClipData = ClipData.newPlainText("Text", text)
-                    val dragShadow = View.DragShadowBuilder(view)
-                    view.startDragAndDrop(dragClipData, dragShadow, null, View.DRAG_FLAG_GLOBAL)
-                }.attach()
-            }
-        }
+    private fun getTagAdapter(tags: MutableList<String>? = null) = EasyAdapter(
+        tags ?: listOfGenre.sorted().toMutableList(),
+        ItemTagBinding::inflate
+    ) { binding, data ->
+        binding.tvTag.text = data
+        DragStartHelper(binding.tvTag) { view, _ ->
+            val text = (view as TextView).text
+            val dragClipData = ClipData.newPlainText("Text", text)
+            val dragShadow = View.DragShadowBuilder(view)
+            view.startDragAndDrop(dragClipData, dragShadow, null, View.DRAG_FLAG_GLOBAL)
+        }.attach()
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) onBackPressed()
