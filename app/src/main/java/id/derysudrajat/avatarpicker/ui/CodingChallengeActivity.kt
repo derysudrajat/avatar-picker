@@ -6,10 +6,8 @@ import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
 import androidx.core.util.component1
@@ -87,7 +85,7 @@ class CodingChallengeActivity : AppCompatActivity() {
 
                 val data = Gson().fromJson(it.toString(), CodingWizard::class.java)
                 char.handleCustomObjectDrop(data, index)
-            }?: run {
+            } ?: run {
                 Log.d("TAG", "configView: index[$index] failed = Clip data is missing JSON")
             }
             remaining
@@ -157,12 +155,8 @@ class CodingChallengeActivity : AppCompatActivity() {
         _isChallengeValid.value = listOfChar.filter { it }.size == 2
     }
 
-    private val charAdapter = object : EasyAdapter<CodingWizard, ItamAvatarBinding>(listOfWizard) {
-        override fun create(parent: ViewGroup): ItamAvatarBinding = ItamAvatarBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
-        )
-
-        override fun onBind(binding: ItamAvatarBinding, data: CodingWizard) {
+    private val charAdapter =
+        EasyAdapter(listOfWizard, ItamAvatarBinding::inflate) { binding, data ->
             binding.ivAvatar.load(data.avatar) {
                 crossfade(true)
                 transformations(RoundedCornersTransformation(8f))
@@ -180,8 +174,6 @@ class CodingChallengeActivity : AppCompatActivity() {
 
             }.attach()
         }
-
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) onBackPressed()
